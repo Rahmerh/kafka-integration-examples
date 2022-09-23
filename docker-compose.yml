@@ -5,6 +5,8 @@ services:
     container_name: user-producer
     build: ./nu.example.UserProducer/.
     image: userproducer:userproducer
+    networks:
+      - 'kafka-example-network'
     depends_on:
       connect:
         condition: service_healthy
@@ -12,6 +14,19 @@ services:
     container_name: user-consumer
     build: ./nu.example.UserConsumer/.
     image: userconsumer:userconsumer
+    networks:
+      - 'kafka-example-network'
+    depends_on:
+      connect:
+        condition: service_healthy
+  firestore-producer:
+    container_name: firestore-producer
+    build: ./nu.example.FirestoreProducer/.
+    image: firestoreproducer:firestoreproducer
+    environment:
+      FIRESTORE_EMULATOR_HOST: 'firebase-emulator:8080'
+    networks:
+      - 'kafka-example-network'
     depends_on:
       connect:
         condition: service_healthy
@@ -152,6 +167,22 @@ services:
     depends_on:
       connect:
         condition: service_healthy
+
+  firebase-emulator:
+    container_name: firebase-emulator
+    build: ./FirebaseEmulator
+    hostname: firebase-emulator
+    image: firebase-emulator:firebase-emulator
+    volumes:
+      - ./FirebaseEmulator:/app
+      - ./FirebaseEmulator/Data:/data
+    ports:
+      # Firestore emulator port
+      - 8080:8080
+      # Firebase emulator UI port
+      - 4200:5000
+    networks:
+      - 'kafka-example-network'
 
 networks:
   kafka-example-network:

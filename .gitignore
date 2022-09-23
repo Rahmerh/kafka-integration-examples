@@ -35,3 +35,8 @@ msbuild.wrn
 
 # Visual Studio 2015
 .vs/
+
+FirebaseEmulator/firebase-debug.log
+FirebaseEmulator/firestore-debug.log
+FirebaseEmulator/ui-debug.log
+FirebaseEmulator/Data/export-on-close

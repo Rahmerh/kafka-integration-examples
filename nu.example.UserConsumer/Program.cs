@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
 using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
-using nu.medapp.Shared.Models;
-using nu.medapp.Shared.Settings;
+using nu.example.Shared.Models;
+using nu.example.Shared.Settings;
 
 var configuration = new ConfigurationBuilder()
  .SetBasePath(Directory.GetCurrentDirectory())

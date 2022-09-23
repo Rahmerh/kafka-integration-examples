@@ -1,4 +1,4 @@
-namespace nu.medapp.Shared.Models;
+namespace nu.example.Shared.Models;
 
 public class User
 {

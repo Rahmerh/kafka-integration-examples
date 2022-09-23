@@ -1,4 +1,4 @@
-namespace nu.medapp.Shared.Settings;
+namespace nu.example.Shared.Settings;
 
 public class KafkaSettings
 {
