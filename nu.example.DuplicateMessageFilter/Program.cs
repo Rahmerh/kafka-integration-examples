@@ -96,6 +96,7 @@ try
 
             if (shouldUpdate)
             {
+                Console.WriteLine($"Sent message to: {kafkaSettings.OutputTopic}");
                 producer.Produce(kafkaSettings.OutputTopic, new Message<Null, string> { Value = cr.Message.Value });
             }
         }
