@@ -30,6 +30,14 @@ I have the following applications/containers in this project
 1. Build (`dotnet build`) the solution.
 2. Execute `docker-compose up -d --build`
 
+## GUIs
+
+I've included a couple of guis to visualize the data you're working with:
+
+- [AKHQ `localhost:2000`](https://github.com/tchiotludo/akhq)
+- [Firebase emulator `localhost:2001`](https://firebase.google.com/docs/emulator-suite)
+- [Redisinsight `localhost:2002`](https://redis.io/docs/stack/insight/)
+
 ### Cache setup
 
 A few small steps are needed to setup redisinsights:
