@@ -227,10 +227,6 @@ services:
     networks:
       - 'kafka-example-network'
 
-volumes:
-  cache:
-    driver: local
-
 networks:
   kafka-example-network:
     name: 'kafka-example-network'
