@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nu.example.UserProducer", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nu.example.FirestoreProducer", "nu.example.FirestoreProducer\nu.example.FirestoreProducer.csproj", "{1BB67C1A-EC61-4C6F-AA2D-0AEE1D23ED5C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nu.example.DuplicateMessageFilter", "nu.example.DuplicateMessageFilter\nu.example.DuplicateMessageFilter.csproj", "{0A7BA781-F444-4A66-9F9B-D21391FC729B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{1BB67C1A-EC61-4C6F-AA2D-0AEE1D23ED5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BB67C1A-EC61-4C6F-AA2D-0AEE1D23ED5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BB67C1A-EC61-4C6F-AA2D-0AEE1D23ED5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A7BA781-F444-4A66-9F9B-D21391FC729B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A7BA781-F444-4A66-9F9B-D21391FC729B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A7BA781-F444-4A66-9F9B-D21391FC729B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A7BA781-F444-4A66-9F9B-D21391FC729B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
