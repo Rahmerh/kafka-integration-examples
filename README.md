@@ -53,9 +53,3 @@ A few small steps are needed to setup redisinsights:
 - Port: `6379`
 - Name: `Cache`
 - Password: `SUPER_SECRET_PASS`
-
-## View topic contents
-
-I've included a AKHQ container to be able to view topics. Open `localhost:1337` in your browser to view.
-
-Open live tail and view the `users` topic. All messages are produced/consumed from there.
