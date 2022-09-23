@@ -8,11 +8,11 @@ A simple example project to get a kafka consumer/producer environment set up. Co
 
 I have the following applications/containers in this project
 
-- nu.example.FirestoreProducer
+- **nu.example.FirestoreProducer**
   - A simple producer which listens to the `Users` collection in firestore and produces a message for each document change.
-- nu.example.UserConsumer
+- **nu.example.UserConsumer**
   - Consumes user messages from the topic and writes the results to the console.
-- nu.example.UserProducer
+- **nu.example.UserProducer**
   - More a PoC than anything else, when it starts it'll produce 100 messages to the topic withh 200ms sleeps in between each message.
 
 ## Requirements
