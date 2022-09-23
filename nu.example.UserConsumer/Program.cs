@@ -1,55 +1,55 @@
 ﻿using System.Text.Json;
 using Confluent.Kafka;
+using Microsoft.Extensions.Configuration;
 using nu.medapp.Shared.Models;
+using nu.medapp.Shared.Settings;
 
-public class Program
+var configuration = new ConfigurationBuilder()
+ .SetBasePath(Directory.GetCurrentDirectory())
+ .AddJsonFile($"appsettings.json")
+ .Build();
+
+var kafkaSettings = configuration.GetRequiredSection("Kafka").Get<KafkaSettings>();
+
+var config = new ConsumerConfig
 {
-    private static void Main(string[] args)
+    BootstrapServers = kafkaSettings.BootstrapServers,
+    SaslMechanism = SaslMechanism.Plain,
+    GroupId = kafkaSettings.GroupId,
+};
+
+using var c = new ConsumerBuilder<Ignore, string>(config).Build();
+
+c.Subscribe("kafka-csharp-example");
+
+CancellationTokenSource cts = new CancellationTokenSource();
+Console.CancelKeyPress += (_, e) =>
+{
+    e.Cancel = true; // prevent the process from terminating.
+    cts.Cancel();
+};
+
+try
+{
+    while (true)
     {
-        var config = new ConsumerConfig
+        try
         {
-            BootstrapServers = "host.docker.internal:9094",
-            SaslMechanism = SaslMechanism.Plain,
-            GroupId = Guid.NewGuid().ToString(),
-            AutoOffsetReset = AutoOffsetReset.Earliest
-        };
+            ConsumeResult<Ignore, string> cr = c.Consume(cts.Token);
 
-        using (var c = new ConsumerBuilder<Ignore, string>(config).Build())
+            DateTime now = DateTime.Now;
+
+            User? user = JsonSerializer.Deserialize<User>(cr.Message.Value);
+
+            Console.WriteLine($"{now.ToString("dd-MM-yyyy HH:mm:ss")} - Consumed user with firstname: {user?.FirstName} and lastname: {user?.LastName}");
+        }
+        catch (ConsumeException e)
         {
-            c.Subscribe("kafka-csharp-example");
-
-            CancellationTokenSource cts = new CancellationTokenSource();
-            Console.CancelKeyPress += (_, e) =>
-            {
-                e.Cancel = true; // prevent the process from terminating.
-                cts.Cancel();
-            };
-
-            try
-            {
-                while (true)
-                {
-                    try
-                    {
-                        var cr = c.Consume(cts.Token);
-
-                        Console.WriteLine($"Consumed message: {cr.Message.Value}");
-
-                        User? user = JsonSerializer.Deserialize<User>(cr.Message.Value);
-
-                        Console.WriteLine($"Consumed user with firstname: {user?.FirstName} and lastname: {user?.LastName}");
-                    }
-                    catch (ConsumeException e)
-                    {
-                        Console.WriteLine($"Error occured: {e.Error.Reason}");
-                    }
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                // Close and Release all the resources held by this consumer  
-                c.Close();
-            }
+            Console.WriteLine($"Error occured: {e.Error.Reason}");
         }
     }
+}
+catch (OperationCanceledException)
+{
+    c.Close();
 }
