@@ -4,7 +4,7 @@
 
 A simple example project to get a kafka consumer/producer environment set up. Complete with docker-compose, infra containers and the works.
 
-## contents
+## Contents
 
 I have the following applications/containers in this project
 
