@@ -1,4 +1,6 @@
-﻿using Confluent.Kafka;
+﻿using System.Text.Json;
+using Confluent.Kafka;
+using nu.medapp.Shared.Models;
 
 public class Program
 {
@@ -14,7 +16,7 @@ public class Program
 
         using (var c = new ConsumerBuilder<Ignore, string>(config).Build())
         {
-            c.Subscribe("");
+            c.Subscribe("kafka-csharp-example");
 
             CancellationTokenSource cts = new CancellationTokenSource();
             Console.CancelKeyPress += (_, e) =>
@@ -30,7 +32,12 @@ public class Program
                     try
                     {
                         var cr = c.Consume(cts.Token);
-                        Console.WriteLine($"Consumed message '{cr.Message.Value}' at: '{cr.TopicPartitionOffset}'.");
+
+                        Console.WriteLine($"Consumed message: {cr.Message.Value}");
+
+                        User? user = JsonSerializer.Deserialize<User>(cr.Message.Value);
+
+                        Console.WriteLine($"Consumed user with firstname: {user?.FirstName} and lastname: {user?.LastName}");
                     }
                     catch (ConsumeException e)
                     {

@@ -1,0 +1,15 @@
+version: '3.9'
+services:
+  user-producer:
+    container_name: user-producer
+    build: ./nu.example.UserProducer/.
+    image: userproducer:userproducer
+  user-consumer:
+    container_name: user-consumer
+    build: ./nu.example.UserConsumer/.
+    image: userconsumer:userconsumer
+
+networks:
+  local-network:
+    name: 'local-network'
+    external: true

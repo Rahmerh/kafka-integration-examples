@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nu.example.Shared", "nu.exa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nu.example.UserConsumer", "nu.example.UserConsumer\nu.example.UserConsumer.csproj", "{B0764B56-9E3A-4370-A88B-728301F1E7F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nu.example.UserProducer", "nu.example.UserProducer\nu.example.UserProducer.csproj", "{9CB73241-D961-430E-AF2A-025CC5FDF272}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{B0764B56-9E3A-4370-A88B-728301F1E7F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0764B56-9E3A-4370-A88B-728301F1E7F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0764B56-9E3A-4370-A88B-728301F1E7F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CB73241-D961-430E-AF2A-025CC5FDF272}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CB73241-D961-430E-AF2A-025CC5FDF272}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CB73241-D961-430E-AF2A-025CC5FDF272}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CB73241-D961-430E-AF2A-025CC5FDF272}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
