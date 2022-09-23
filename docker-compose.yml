@@ -10,6 +10,7 @@ services:
     depends_on:
       connect:
         condition: service_healthy
+
   user-consumer:
     container_name: user-consumer
     build: ./nu.example.UserConsumer/.
@@ -19,6 +20,7 @@ services:
     depends_on:
       connect:
         condition: service_healthy
+
   firestore-producer:
     container_name: firestore-producer
     build: ./nu.example.FirestoreProducer/.
@@ -29,6 +31,20 @@ services:
       - 'kafka-example-network'
     depends_on:
       connect:
+        condition: service_healthy
+      firebase-emulator:
+        condition: service_healthy
+
+  duplicate-message-filter:
+    container_name: duplicate-message-filter
+    build: ./nu.example.DuplicateMessageFilter/.
+    image: messagefilter:messagefilter
+    networks:
+      - 'kafka-example-network'
+    depends_on:
+      connect:
+        condition: service_healthy
+      cache:
         condition: service_healthy
 
   # Infra
@@ -144,7 +160,8 @@ services:
     command: |
       "
       echo -e 'Creating kafka topics'
-      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic kafka-csharp-example --replication-factor 1 --partitions 1
+      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic users --replication-factor 1 --partitions 1
+      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic users-filtered --replication-factor 1 --partitions 1
       "
 
   akhq:
@@ -161,7 +178,7 @@ services:
                   url: "http://connect:8083"
 
     ports:
-      - 1337:8080
+      - 2000:8080
     networks:
       - 'kafka-example-network'
     depends_on:
@@ -180,17 +197,35 @@ services:
       # Firestore emulator port
       - 8080:8080
       # Firebase emulator UI port
-      - 4200:5000
+      - 2001:5000
     networks:
       - 'kafka-example-network'
 
   cache:
     image: redis:latest
+    hostname: cache
+    container_name: cache
     ports:
       - '6379:6379'
     command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
     volumes:
-      - cache:/data
+      - ./Cache/Data:/data
+    networks:
+      - 'kafka-example-network'
+    healthcheck:
+      test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
+      interval: 1s
+      timeout: 3s
+      retries: 5
+
+  redisinsight:
+    image: redislabs/redisinsight:latest
+    ports:
+      - '2002:8001'
+    volumes:
+      - ./Cache/RedisInsight:/db
+    networks:
+      - 'kafka-example-network'
 
 volumes:
   cache:

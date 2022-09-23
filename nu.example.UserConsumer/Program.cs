@@ -20,7 +20,7 @@ var config = new ConsumerConfig
 
 using var c = new ConsumerBuilder<Ignore, string>(config).Build();
 
-c.Subscribe("kafka-csharp-example");
+c.Subscribe(kafkaSettings.Topic);
 
 CancellationTokenSource cts = new CancellationTokenSource();
 Console.CancelKeyPress += (_, e) =>

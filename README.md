@@ -8,12 +8,14 @@ A simple example project to get a kafka consumer/producer environment set up. Co
 
 I have the following applications/containers in this project
 
+- **nu.example.DuplicateMessageFilter**
+  - An example for a duplicate message filter. This application caches the user hashes in a redis cache and compares it vs the incoming user.
 - **nu.example.FirestoreProducer**
   - A simple producer which listens to the `Users` collection in firestore and produces a message for each document change.
 - **nu.example.UserConsumer**
   - Consumes user messages from the topic and writes the results to the console.
 - **nu.example.UserProducer**
-  - More a PoC than anything else, when it starts it'll produce 100 messages to the topic with 200ms sleeps in between each message.
+  - More a PoC than anything else, when it starts it'll produce a single message to the `users` topic.
 - **nu.example.Shared**
   - Library project containing models, settings and dependencies.
 
@@ -28,8 +30,21 @@ I have the following applications/containers in this project
 1. Build (`dotnet build`) the solution.
 2. Execute `docker-compose up -d --build`
 
+### Cache setup
+
+A few small steps are needed to setup redisinsights:
+
+1. Navigate to `localhost:2002`
+2. Click on `I already have a database` then click on `Connect to a Redis Database`
+3. Fill in the following values:
+
+- Host: `cache`
+- Port: `6379`
+- Name: `Cache`
+- Password: `Same value you can find in docker-compose.yml`
+
 ## View topic contents
 
 I've included a AKHQ container to be able to view topics. Open `localhost:1337` in your browser to view.
 
-Open live tail and view the `kafka-csharp-example` topic. All messages are produced/consumed from there.
+Open live tail and view the `users` topic. All messages are produced/consumed from there.

@@ -31,6 +31,9 @@ var config = new ProducerConfig
 
 using var kafkaProducer = new ProducerBuilder<Null, string>(config).Build();
 
+
+// Firestore setup
+
 FirestoreChangeListener listener = usersCollection.Listen(snapshot =>
     {
 

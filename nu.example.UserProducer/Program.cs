@@ -19,24 +19,20 @@ var config = new ProducerConfig
 
 using var p = new ProducerBuilder<Null, string>(config).Build();
 
-for (int i = 0; i < 100; ++i)
+User user = new User
 {
-    User user = new User
-    {
-        Id = Guid.NewGuid(),
-        FirstName = "John",
-        LastName = "Doe " + i
-    };
+    Id = Guid.Parse("116e25bc-862e-4d94-961f-16d0308aeaea"),
+    FirstName = "John",
+    LastName = "Doe"
+};
 
-    string userJson = JsonSerializer.Serialize(user);
+string userJson = JsonSerializer.Serialize(user);
 
-    DateTime now = DateTime.Now;
+DateTime now = DateTime.Now;
 
-    Console.WriteLine($"{now.ToString("dd-MM-yyyy HH:mm:ss")} - Producing message: {userJson}");
+Console.WriteLine($"{now.ToString("dd-MM-yyyy HH:mm:ss")} - Producing message: {userJson}");
 
-    p.Produce("kafka-csharp-example", new Message<Null, string> { Value = userJson });
-    Thread.Sleep(100);
-}
+p.Produce(kafkaSettings.Topic, new Message<Null, string> { Value = userJson });
 
 // wait for up to 10 seconds for any inflight messages to be delivered.
 p.Flush(TimeSpan.FromSeconds(10));

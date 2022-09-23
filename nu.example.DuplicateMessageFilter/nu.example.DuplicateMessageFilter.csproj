@@ -5,6 +5,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
         <PackageReference Include="StackExchange.Redis" Version="2.6.66" />
     </ItemGroup>
 
@@ -14,5 +15,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="appsettings.json" CopyToOutputDirectory="Always" />
+    </ItemGroup>
 
 </Project>

@@ -1,8 +1,9 @@
 namespace nu.example.Shared.Settings;
 
-public class KafkaSettings
+public class KafkaStreamingSettings
 {
     public string? BootstrapServers { get; set; }
     public string? GroupId { get; set; }
-    public string? Topic { get; set; }
+    public string? InputTopic { get; set; }
+    public string? OutputTopic { get; set; }
 }
