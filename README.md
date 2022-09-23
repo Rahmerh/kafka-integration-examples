@@ -26,8 +26,6 @@ I have the following applications/containers in this project
 1. Build (`dotnet build`) the solution.
 2. Execute `docker-compose up -d --build`
 
-The producer will automatically produce 100 messages with 200ms sleeps between each message.
-
 ## View topic contents
 
 I've included a AKHQ container to be able to view topics. Open `localhost:1337` in your browser to view.
