@@ -41,7 +41,7 @@ A few small steps are needed to setup redisinsights:
 - Host: `cache`
 - Port: `6379`
 - Name: `Cache`
-- Password: `Same value you can find in docker-compose.yml`
+- Password: `SUPER_SECRET_PASS`
 
 ## View topic contents
 
