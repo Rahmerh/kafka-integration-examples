@@ -13,7 +13,7 @@ I have the following applications/containers in this project
 - **nu.example.UserConsumer**
   - Consumes user messages from the topic and writes the results to the console.
 - **nu.example.UserProducer**
-  - More a PoC than anything else, when it starts it'll produce 100 messages to the topic withh 200ms sleeps in between each message.
+  - More a PoC than anything else, when it starts it'll produce 100 messages to the topic with 200ms sleeps in between each message.
 - **nu.example.Shared**
   - Library project containing models, settings and dependencies.
 
