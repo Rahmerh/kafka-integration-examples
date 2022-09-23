@@ -35,11 +35,11 @@ I have the following applications/containers in this project
 I've included a couple of guis to visualize the data you're working with:
 
 - [AKHQ](https://github.com/tchiotludo/akhq)
-  - [`localhost:2000`]("localhost:2000")
+  - [localhost:2000]("localhost:2000")
 - [Firebase emulator](https://firebase.google.com/docs/emulator-suite)
-  - [`localhost:2001`]("localhost:2001")
+  - [localhost:2001]("localhost:2001")
 - [Redisinsight](https://redis.io/docs/stack/insight/)
-  - [`localhost:2002`]("localhost:2002")
+  - [localhost:2002]("localhost:2002")
 
 ### Cache setup
 
