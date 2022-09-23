@@ -5,10 +5,16 @@ services:
     container_name: user-producer
     build: ./nu.example.UserProducer/.
     image: userproducer:userproducer
+    depends_on:
+      connect:
+        condition: service_healthy
   user-consumer:
     container_name: user-consumer
     build: ./nu.example.UserConsumer/.
     image: userconsumer:userconsumer
+    depends_on:
+      connect:
+        condition: service_healthy
 
   # Infra
   zookeeper:
@@ -141,6 +147,8 @@ services:
 
     ports:
       - 1337:8080
+    networks:
+      - 'kafka-example-network'
     depends_on:
       connect:
         condition: service_healthy
