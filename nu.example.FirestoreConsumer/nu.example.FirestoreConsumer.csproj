@@ -4,6 +4,10 @@
         <ProjectReference Include="..\nu.example.Shared\nu.example.Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="Google.Cloud.Firestore" Version="3.0.0" />
+    </ItemGroup>
+
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net6.0</TargetFramework>

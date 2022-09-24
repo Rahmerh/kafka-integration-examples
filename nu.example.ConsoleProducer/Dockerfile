@@ -6,4 +6,4 @@ RUN apt-get install -y librdkafka-dev
 WORKDIR /bin
 COPY ./bin/Debug/net6.0/* ./
 
-ENTRYPOINT ["dotnet", "/bin/nu.example.UserProducer.dll"]
+ENTRYPOINT ["dotnet", "/bin/nu.example.ConsoleProducer.dll"]

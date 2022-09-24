@@ -13,9 +13,9 @@ I have the following applications/containers in this project
 - **nu.example.FirestoreProducer**
   - A simple producer which listens to the `Users` collection in firestore and produces a message for each document change.
 - **nu.example.FirestoreConsumer**
-  - Consumes user messages from the topic and writes the results to the console.
-- **nu.example.UserProducer**
-  - More a PoC than anything else, when it starts it'll produce a single message to the `users` topic.
+  - Consumes bank account messages from the `bank-accounts` topic and writes them to the `BankAccounts` firestore collection.
+- **nu.example.ConsoleProducer**
+  - A simple console producer which will produce a static user or bankaccount message. Can be used to test several consumer/producers.
 - **nu.example.Shared**
   - Library project containing models, settings and shared dependencies.
 
@@ -59,6 +59,6 @@ A few small steps are needed to setup redisinsights:
 ## Todo
 
 - [ ] Proper (de)serialization of messages to and from topics.
-- [ ] Elastic integration
+- [ ] Elastic integration project.
 
 More to come..

@@ -9,7 +9,7 @@ using nu.example.Shared.Settings;
 // Firestore setup
 FirestoreDb db = new FirestoreDbBuilder
 {
-    ProjectId = "kafka-in-csharp",
+    ProjectId = "kafka-examples",
     EmulatorDetection = EmulatorDetection.EmulatorOrProduction
 }.Build();
 
@@ -31,25 +31,25 @@ var config = new ProducerConfig
 
 using var kafkaProducer = new ProducerBuilder<Null, string>(config).Build();
 
-
-// Firestore setup
-
 FirestoreChangeListener listener = usersCollection.Listen(snapshot =>
     {
-
         foreach (DocumentSnapshot document in snapshot.Documents)
         {
             User user = document.ConvertTo<User>();
 
-            Console.WriteLine($"Received change for user with id: {user.Id}");
+            nu.example.Shared.Models.User internalUser = new nu.example.Shared.Models.User
 
-            nu.example.Shared.Models.User internalUser = new nu.example.Shared.Models.User();
-            internalUser.FirstName = user.FirstName;
-            internalUser.LastName = user.LastName;
+            {
+                Id = Guid.Parse(document.Id),
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            };
+
+            Console.WriteLine($"Received change for user with id: {internalUser.Id}");
 
             string userJson = JsonSerializer.Serialize(internalUser);
 
-            kafkaProducer.Produce("kafka-csharp-example", new Message<Null, string> { Value = userJson });
+            kafkaProducer.Produce("users", new Message<Null, string> { Value = userJson });
         }
     });
 

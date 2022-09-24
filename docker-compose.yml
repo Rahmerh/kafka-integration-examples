@@ -1,20 +1,12 @@
 version: '3.9'
 services:
   # Applications
-  user-producer:
-    container_name: user-producer
-    build: ./nu.example.UserProducer/.
-    image: userproducer:userproducer
-    networks:
-      - 'kafka-example-network'
-    depends_on:
-      connect:
-        condition: service_healthy
-
-  user-consumer:
-    container_name: user-consumer
-    build: ./nu.example.UserConsumer/.
-    image: userconsumer:userconsumer
+  firestore-consumer:
+    container_name: firestore-consumer
+    build: ./nu.example.FirestoreConsumer/.
+    image: firestoreconsumer:firestoreconsumer
+    environment:
+      FIRESTORE_EMULATOR_HOST: 'firebase-emulator:8080'
     networks:
       - 'kafka-example-network'
     depends_on:
@@ -154,10 +146,12 @@ services:
       echo -e 'Creating kafka topics'
       kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic users --replication-factor 1 --partitions 1
       kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic users-filtered --replication-factor 1 --partitions 1
+      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic bank-accounts --replication-factor 1 --partitions 1
       "
 
   akhq:
     image: tchiotludo/akhq
+    container_name: akhq
     environment:
       AKHQ_CONFIGURATION: |
         akhq:
@@ -212,6 +206,7 @@ services:
 
   redisinsight:
     image: redislabs/redisinsight:latest
+    container_name: redisinsight
     ports:
       - '2002:8001'
     volumes:

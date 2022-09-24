@@ -5,9 +5,9 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nu.example.Shared", "nu.example.Shared\nu.example.Shared.csproj", "{8EE8F1AC-3F26-45AD-824D-1932ED7B6455}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nu.example.UserConsumer", "nu.example.UserConsumer\nu.example.UserConsumer.csproj", "{B0764B56-9E3A-4370-A88B-728301F1E7F3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nu.example.FirestoreConsumer", "nu.example.FirestoreConsumer\nu.example.FirestoreConsumer.csproj", "{B0764B56-9E3A-4370-A88B-728301F1E7F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nu.example.UserProducer", "nu.example.UserProducer\nu.example.UserProducer.csproj", "{9CB73241-D961-430E-AF2A-025CC5FDF272}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nu.example.ConsoleProducer", "nu.example.ConsoleProducer\nu.example.ConsoleProducer.csproj", "{9CB73241-D961-430E-AF2A-025CC5FDF272}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nu.example.FirestoreProducer", "nu.example.FirestoreProducer\nu.example.FirestoreProducer.csproj", "{1BB67C1A-EC61-4C6F-AA2D-0AEE1D23ED5C}"
 EndProject

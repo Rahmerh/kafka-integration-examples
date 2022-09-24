@@ -1,9 +1,21 @@
 ﻿using System.Text.Json;
 using Confluent.Kafka;
+using Google.Api.Gax;
+using Google.Cloud.Firestore;
 using Microsoft.Extensions.Configuration;
-using nu.example.Shared.Models;
+using nu.example.FirestoreConsumer.Models;
 using nu.example.Shared.Settings;
 
+// Firestore setup
+FirestoreDb db = new FirestoreDbBuilder
+{
+    ProjectId = "kafka-examples",
+    EmulatorDetection = EmulatorDetection.EmulatorOrProduction
+}.Build();
+
+CollectionReference bankAccountCollection = db.Collection("BankAccounts");
+
+// Kafka setup
 var configuration = new ConfigurationBuilder()
  .SetBasePath(Directory.GetCurrentDirectory())
  .AddJsonFile($"appsettings.json")
@@ -37,11 +49,24 @@ try
         {
             ConsumeResult<Ignore, string> cr = c.Consume(cts.Token);
 
-            DateTime now = DateTime.Now;
+            nu.example.Shared.Models.BankAccount? bankAccount = JsonSerializer.Deserialize<nu.example.Shared.Models.BankAccount>(cr.Message.Value);
 
-            User? user = JsonSerializer.Deserialize<User>(cr.Message.Value);
+            if (bankAccount == null)
+            {
+                continue;
+            }
 
-            Console.WriteLine($"{now.ToString("dd-MM-yyyy HH:mm:ss")} - Consumed user with firstname: {user?.FirstName} and lastname: {user?.LastName}");
+            Console.WriteLine($"Processing update for bankaccount with id: {bankAccount.Id.ToString()}");
+
+            BankAccount internalBankAccount = new BankAccount
+            {
+                UserId = bankAccount.UserId.ToString(),
+                AccountNumber = bankAccount.AccountNumber
+            };
+
+            await bankAccountCollection
+                    .Document(bankAccount.Id.ToString())
+                    .SetAsync(internalBankAccount, SetOptions.MergeAll);
         }
         catch (ConsumeException e)
         {

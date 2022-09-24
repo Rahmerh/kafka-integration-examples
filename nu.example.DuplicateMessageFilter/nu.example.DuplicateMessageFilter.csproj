@@ -5,7 +5,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
         <PackageReference Include="StackExchange.Redis" Version="2.6.66" />
     </ItemGroup>
 
