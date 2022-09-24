@@ -9,7 +9,7 @@ This repository functions as a bunch of example integrations you can have with k
 I have the following applications/containers in this project
 
 - **nu.example.DuplicateMessageFilter**
-  - An example for a duplicate message filter. This application caches the user hashes in a redis cache and compares it vs the incoming user.
+  - An example for a duplicate message filter. This application caches the user hashes in a redis cache and compares it vs the incoming user. If the incoming message is the same, it won't produce the user message to the output topic.
 - **nu.example.FirestoreProducer**
   - A simple producer which listens to the `Users` collection in firestore and produces a message for each document change.
 - **nu.example.FirestoreConsumer**
@@ -55,3 +55,10 @@ A few small steps are needed to setup redisinsights:
 - Port: `6379`
 - Name: `Cache`
 - Password: `SUPER_SECRET_PASS`
+
+## Todo
+
+- [ ] Proper (de)serialization of messages to and from topics.
+- [ ] Elastic integration
+
+More to come..
