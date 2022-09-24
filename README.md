@@ -64,7 +64,7 @@ I'm currently the only one working on this repository and am constantly pushing 
 
 ## Todo
 
-- [ ] Proper (de)serialization of messages to and from topics.
+- [x] Proper (de)serialization of messages to and from topics.
 - [ ] Fix configuration warnings that occur during startup.
 - [ ] Elastic integration project.
 - [ ] HTTP integration project. (Integration which makes and receives simple http requests.)

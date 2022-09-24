@@ -1,9 +1,10 @@
-﻿using System.Text.Json;
-using Confluent.Kafka;
+﻿using Confluent.Kafka;
+using Confluent.SchemaRegistry.Serdes;
 using Google.Api.Gax;
 using Google.Cloud.Firestore;
 using Microsoft.Extensions.Configuration;
-using nu.example.FirestoreConsumer.Models;
+using nu.example.Shared.Models;
+using Confluent.Kafka.SyncOverAsync;
 using nu.example.Shared.Settings;
 
 // Firestore setup
@@ -30,8 +31,9 @@ var config = new ConsumerConfig
     GroupId = kafkaSettings.GroupId,
 };
 
-using var c = new ConsumerBuilder<Ignore, string>(config)
+using var c = new ConsumerBuilder<Ignore, BankAccount>(config)
     .SetErrorHandler((_, e) => Console.WriteLine($"Error occured: {e.Reason}"))
+    .SetValueDeserializer(new JsonDeserializer<BankAccount>().AsSyncOverAsync())
     .Build();
 
 c.Subscribe(kafkaSettings.Topic);
@@ -47,18 +49,13 @@ try
 {
     while (true)
     {
-        ConsumeResult<Ignore, string> cr = c.Consume(cts.Token);
+        ConsumeResult<Ignore, BankAccount> cr = c.Consume(cts.Token);
 
-        nu.example.Shared.Models.BankAccount? bankAccount = JsonSerializer.Deserialize<nu.example.Shared.Models.BankAccount>(cr.Message.Value);
-
-        if (bankAccount == null)
-        {
-            continue;
-        }
+        BankAccount bankAccount = cr.Message.Value;
 
         Console.WriteLine($"Processing update for bankaccount with id: {bankAccount.Id.ToString()}");
 
-        BankAccount internalBankAccount = new BankAccount
+        nu.example.FirestoreConsumer.Models.BankAccount externalBankAccount = new nu.example.FirestoreConsumer.Models.BankAccount
         {
             UserId = bankAccount.UserId.ToString(),
             AccountNumber = bankAccount.AccountNumber
@@ -66,7 +63,7 @@ try
 
         await bankAccountCollection
                 .Document(bankAccount.Id.ToString())
-                .SetAsync(internalBankAccount, SetOptions.MergeAll);
+                .SetAsync(externalBankAccount, SetOptions.MergeAll);
     }
 }
 catch (OperationCanceledException)

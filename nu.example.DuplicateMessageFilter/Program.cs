@@ -2,6 +2,9 @@
 using System.Text;
 using System.Text.Json;
 using Confluent.Kafka;
+using Confluent.Kafka.SyncOverAsync;
+using Confluent.SchemaRegistry;
+using Confluent.SchemaRegistry.Serdes;
 using Microsoft.Extensions.Configuration;
 using nu.example.DuplicateMessageFilter.Services;
 using nu.example.Shared.Models;
@@ -33,7 +36,9 @@ var consumerConfig = new ConsumerConfig
     SaslPassword = ""
 };
 
-using var c = new ConsumerBuilder<Ignore, string>(consumerConfig).Build();
+using var c = new ConsumerBuilder<Ignore, User>(consumerConfig)
+    .SetValueDeserializer(new JsonDeserializer<User>().AsSyncOverAsync())
+    .Build();
 
 c.Subscribe(kafkaSettings.InputTopic);
 
@@ -53,8 +58,21 @@ var producerConfig = new ProducerConfig
     SaslPassword = ""
 };
 
-using var producer = new ProducerBuilder<Null, string>(producerConfig)
+var schemaRegistryConfig = new SchemaRegistryConfig
+{
+    Url = kafkaSettings.SchemaRegistryUrl
+};
+
+var jsonSerializerConfig = new JsonSerializerConfig
+{
+    BufferBytes = 100
+};
+
+using var schemaRegistry = new CachedSchemaRegistryClient(schemaRegistryConfig);
+
+using var producer = new ProducerBuilder<Null, User>(producerConfig)
     .SetErrorHandler((_, e) => Console.WriteLine($"Error occured: {e.Reason}"))
+    .SetValueSerializer(new JsonSerializer<User>(schemaRegistry, jsonSerializerConfig).AsSyncOverAsync())
     .Build();
 
 try
@@ -63,18 +81,12 @@ try
     {
         bool shouldUpdate = true;
 
-        ConsumeResult<Ignore, string> cr = c.Consume(cts.Token);
+        ConsumeResult<Ignore, User> cr = c.Consume(cts.Token);
 
-        User? user = JsonSerializer.Deserialize<User>(cr.Message.Value);
-
-        if (user == null)
-        {
-            Console.WriteLine("User couldn't be deserialized.");
-            continue;
-        }
+        User user = cr.Message.Value;
 
         String? userHash = redisService.getStringByValue(user.Id.ToString());
-        string hashedUser = sha256_hash(cr.Message.Value);
+        string hashedUser = sha256_hash(JsonSerializer.Serialize(user));
 
         if (string.IsNullOrEmpty(userHash))
         {
@@ -97,7 +109,7 @@ try
         if (shouldUpdate)
         {
             Console.WriteLine($"Sent message to: {kafkaSettings.OutputTopic}");
-            producer.Produce(kafkaSettings.OutputTopic, new Message<Null, string> { Value = cr.Message.Value });
+            producer.Produce(kafkaSettings.OutputTopic, new Message<Null, User> { Value = cr.Message.Value });
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿using System.Text.Json;
-using Confluent.Kafka;
+﻿using Confluent.Kafka;
+using Confluent.Kafka.SyncOverAsync;
+using Confluent.SchemaRegistry;
+using Confluent.SchemaRegistry.Serdes;
 using Microsoft.Extensions.Configuration;
 using nu.example.Shared.Models;
 using nu.example.Shared.Settings;
@@ -17,7 +19,25 @@ var config = new ProducerConfig
     SaslMechanism = SaslMechanism.Plain,
 };
 
-using var p = new ProducerBuilder<Null, string>(config).Build();
+var schemaRegistryConfig = new SchemaRegistryConfig
+{
+    Url = kafkaSettings.SchemaRegistryUrl
+};
+
+var jsonSerializerConfig = new JsonSerializerConfig
+{
+    BufferBytes = 100
+};
+
+using var schemaRegistry = new CachedSchemaRegistryClient(schemaRegistryConfig);
+
+using var bankAccountProducer = new ProducerBuilder<Null, BankAccount>(config)
+    .SetValueSerializer(new JsonSerializer<BankAccount>(schemaRegistry, jsonSerializerConfig).AsSyncOverAsync())
+    .Build();
+
+using var userProducer = new ProducerBuilder<Null, User>(config)
+    .SetValueSerializer(new JsonSerializer<User>(schemaRegistry, jsonSerializerConfig).AsSyncOverAsync())
+    .Build();
 
 Console.WriteLine("What message to you want to produce?\n1. User message to 'users'.\n2. BankAccount message to 'bank-accounts'.");
 
@@ -47,13 +67,11 @@ while (true)
             LastName = "Doe"
         };
 
-        string userJson = JsonSerializer.Serialize(user);
-
         DateTime now = DateTime.Now;
 
-        Console.WriteLine($"{now.ToString("dd-MM-yyyy HH:mm:ss")} - Producing message: {userJson}, to topic: 'users'");
+        Console.WriteLine($"{now.ToString("dd-MM-yyyy HH:mm:ss")} - Producing message to topic: 'users'");
 
-        p.Produce("users", new Message<Null, string> { Value = userJson });
+        userProducer.Produce("users", new Message<Null, User> { Value = user });
     }
     else if (choiceParsed == 2)
     {
@@ -64,18 +82,16 @@ while (true)
             AccountNumber = "Account number 1"
         };
 
-        string bankAccountJson = JsonSerializer.Serialize(bankAccount);
-
         DateTime now = DateTime.Now;
 
-        Console.WriteLine($"{now.ToString("dd-MM-yyyy HH:mm:ss")} - Producing message: {bankAccountJson} to topic: 'bank-accounts'");
+        Console.WriteLine($"{now.ToString("dd-MM-yyyy HH:mm:ss")} - Producing message to topic: 'bank-accounts'");
 
-        p.Produce("bank-accounts", new Message<Null, string> { Value = bankAccountJson });
+        bankAccountProducer.Produce("bank-accounts", new Message<Null, BankAccount> { Value = bankAccount });
     }
     else
     {
         Console.WriteLine($"Unknown option: {choiceParsed}");
     }
 
-    p.Flush(TimeSpan.FromSeconds(10));
+    bankAccountProducer.Flush(TimeSpan.FromSeconds(10));
 }

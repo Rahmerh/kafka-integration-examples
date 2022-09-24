@@ -1,9 +1,11 @@
-﻿using System.Text.Json;
-using Confluent.Kafka;
+﻿using Confluent.Kafka;
+using Confluent.Kafka.SyncOverAsync;
+using Confluent.SchemaRegistry;
+using Confluent.SchemaRegistry.Serdes;
 using Google.Api.Gax;
 using Google.Cloud.Firestore;
 using Microsoft.Extensions.Configuration;
-using nu.example.FirestoreProducer.Models;
+using nu.example.Shared.Models;
 using nu.example.Shared.Settings;
 
 // Firestore setup
@@ -29,16 +31,29 @@ var config = new ProducerConfig
     SaslMechanism = SaslMechanism.Plain,
 };
 
-using var kafkaProducer = new ProducerBuilder<Null, string>(config).Build();
+var schemaRegistryConfig = new SchemaRegistryConfig
+{
+    Url = kafkaSettings.SchemaRegistryUrl
+};
+
+var jsonSerializerConfig = new JsonSerializerConfig
+{
+    BufferBytes = 100
+};
+
+using var schemaRegistry = new CachedSchemaRegistryClient(schemaRegistryConfig);
+
+using var kafkaProducer = new ProducerBuilder<Null, User>(config)
+    .SetValueSerializer(new JsonSerializer<User>(schemaRegistry, jsonSerializerConfig).AsSyncOverAsync())
+    .Build();
 
 FirestoreChangeListener listener = usersCollection.Listen(snapshot =>
     {
         foreach (DocumentSnapshot document in snapshot.Documents)
         {
-            User user = document.ConvertTo<User>();
+            nu.example.FirestoreProducer.Models.User user = document.ConvertTo<nu.example.FirestoreProducer.Models.User>();
 
-            nu.example.Shared.Models.User internalUser = new nu.example.Shared.Models.User
-
+            User internalUser = new User
             {
                 Id = Guid.Parse(document.Id),
                 FirstName = user.FirstName,
@@ -47,9 +62,7 @@ FirestoreChangeListener listener = usersCollection.Listen(snapshot =>
 
             Console.WriteLine($"Received change for user with id: {internalUser.Id}");
 
-            string userJson = JsonSerializer.Serialize(internalUser);
-
-            kafkaProducer.Produce("users", new Message<Null, string> { Value = userJson });
+            kafkaProducer.Produce("users", new Message<Null, User> { Value = internalUser });
         }
     });
 

@@ -95,6 +95,22 @@ services:
     networks:
       - 'kafka-example-network'
 
+  kafka-schema-registry:
+    image: confluentinc/cp-schema-registry:latest
+    hostname: kafka-schema-registry
+    container_name: kafka-schema-registry
+    ports:
+      - '8081:8081'
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://broker:9092
+      SCHEMA_REGISTRY_HOST_NAME: kafka-schema-registry
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    networks:
+      - 'kafka-example-network'
+    depends_on:
+      broker:
+        condition: service_healthy
+
   connect:
     container_name: kafka-connect
     image: confluentinc/cp-kafka-connect:latest
@@ -159,10 +175,11 @@ services:
             docker-kafka-server:
               properties:
                 bootstrap.servers: "broker:9092"
+              schema-registry:
+                url: "http://kafka-schema-registry:8081"
               connect:
                 - name: "connect"
                   url: "http://connect:8083"
-
     ports:
       - 2000:8080
     networks:
