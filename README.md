@@ -1,8 +1,8 @@
 <img height="60" width="60" src="https://www.explore-group.com/storage/images-processed/w-1500_h-auto_m-fit_s-any__600_470085481.jpeg">
 
-# Kafka with dotnet example project
+# Kafka integration examples
 
-A simple example project to get a kafka consumer/producer environment set up. Complete with docker-compose, infra containers and the works.
+This repository functions as a bunch of example integrations you can have with kafka. Written in C# and provided with docker-compose file to easily set up all projects locally, the complete project contains infra- and project containers, GUIs to view data, setup instructions, the works.
 
 ## Contents
 
