@@ -37,7 +37,7 @@ services:
       cache:
         condition: service_healthy
 
-  # Infra
+  # Kafka infra
   zookeeper:
     container_name: kafka-zookeeper
     image: confluentinc/cp-zookeeper:latest
@@ -164,7 +164,7 @@ services:
       kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic users-filtered --replication-factor 1 --partitions 1
       kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic bank-accounts --replication-factor 1 --partitions 1
       "
-
+  # Misc infra
   akhq:
     image: tchiotludo/akhq
     container_name: akhq

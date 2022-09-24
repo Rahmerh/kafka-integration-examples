@@ -8,7 +8,9 @@ These projects are meant as examples to custom built integrations instead of the
 
 ## Contents
 
-I have the following applications/containers in this project
+### Projects
+
+The following projects (with description) are currently in this repo. Everything should be started automatically if you follow the steps in the 'Usage' section.
 
 - **nu.example.DuplicateMessageFilter**
   - An example for a duplicate message filter. This application caches the user hashes in a redis cache and compares it vs the incoming user. If the incoming message is the same, it won't produce the user message to the output topic.
@@ -20,6 +22,23 @@ I have the following applications/containers in this project
   - A simple console producer which will produce a static user or bankaccount message. Can be used to test several consumer/producers. This project is not included in the docker-compose file but can be run locally. Simply execute `dotnet run` in the project folder and choose an option.
 - **nu.example.Shared**
   - Library project containing models, settings and shared dependencies.
+
+### Kafka infra
+
+I have the following containers/kafka services included in the docker-compose file:
+
+- 1 Zookeeper instance
+- 1 Broker instance
+- 1 Connect instance
+- 1 Schema registry instance (For automatic (de)serialization)
+
+### Other infra
+
+The following containers are automatically created to be used in the integration projects.
+
+- 1 Redis cache + 1 redisinsight instance
+- 1 Firesbase emulator (Only the firestore emulator is set up)
+- 1 AKHQ instance
 
 ## Requirements
 
