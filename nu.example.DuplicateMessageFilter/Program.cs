@@ -53,56 +53,51 @@ var producerConfig = new ProducerConfig
     SaslPassword = ""
 };
 
-using var producer = new ProducerBuilder<Null, string>(producerConfig).Build();
+using var producer = new ProducerBuilder<Null, string>(producerConfig)
+    .SetErrorHandler((_, e) => Console.WriteLine($"Error occured: {e.Reason}"))
+    .Build();
 
 try
 {
     while (true)
     {
-        try
+        bool shouldUpdate = true;
+
+        ConsumeResult<Ignore, string> cr = c.Consume(cts.Token);
+
+        User? user = JsonSerializer.Deserialize<User>(cr.Message.Value);
+
+        if (user == null)
         {
-            bool shouldUpdate = true;
-
-            ConsumeResult<Ignore, string> cr = c.Consume(cts.Token);
-
-            User? user = JsonSerializer.Deserialize<User>(cr.Message.Value);
-
-            if (user == null)
-            {
-                Console.WriteLine("User couldn't be deserialized.");
-                continue;
-            }
-
-            String? userHash = redisService.getStringByValue(user.Id.ToString());
-            string hashedUser = sha256_hash(cr.Message.Value);
-
-            if (string.IsNullOrEmpty(userHash))
-            {
-                Console.WriteLine($"Value for id {user.Id} was not found, putting it into redis.");
-                redisService.putStringByValue(user.Id.ToString(), hashedUser);
-                shouldUpdate = true;
-            }
-            else if (userHash == hashedUser)
-            {
-                Console.WriteLine($"Skipping update.");
-                shouldUpdate = false;
-            }
-            else
-            {
-                Console.WriteLine($"Value for id {user.Id} was different, updating.");
-                redisService.putStringByValue(user.Id.ToString(), hashedUser);
-                shouldUpdate = true;
-            }
-
-            if (shouldUpdate)
-            {
-                Console.WriteLine($"Sent message to: {kafkaSettings.OutputTopic}");
-                producer.Produce(kafkaSettings.OutputTopic, new Message<Null, string> { Value = cr.Message.Value });
-            }
+            Console.WriteLine("User couldn't be deserialized.");
+            continue;
         }
-        catch (ConsumeException e)
+
+        String? userHash = redisService.getStringByValue(user.Id.ToString());
+        string hashedUser = sha256_hash(cr.Message.Value);
+
+        if (string.IsNullOrEmpty(userHash))
         {
-            Console.WriteLine($"Error occured: {e.Error.Reason}");
+            Console.WriteLine($"Value for id {user.Id} was not found, putting it into redis.");
+            redisService.putStringByValue(user.Id.ToString(), hashedUser);
+            shouldUpdate = true;
+        }
+        else if (userHash == hashedUser)
+        {
+            Console.WriteLine($"Skipping update.");
+            shouldUpdate = false;
+        }
+        else
+        {
+            Console.WriteLine($"Value for id {user.Id} was different, updating.");
+            redisService.putStringByValue(user.Id.ToString(), hashedUser);
+            shouldUpdate = true;
+        }
+
+        if (shouldUpdate)
+        {
+            Console.WriteLine($"Sent message to: {kafkaSettings.OutputTopic}");
+            producer.Produce(kafkaSettings.OutputTopic, new Message<Null, string> { Value = cr.Message.Value });
         }
     }
 }
