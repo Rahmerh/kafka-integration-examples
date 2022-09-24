@@ -58,9 +58,14 @@ A few small steps are needed to setup redisinsights:
 - Name: `Cache`
 - Password: `SUPER_SECRET_PASS`
 
+## Stability
+
+I'm currently the only one working on this repository and am constantly pushing to the main branch. This means it's possible I accidentally push breaking changes. Please make sure to pull frequently if you're using my repo as an example. I cannot guarantee any stability in this project.
+
 ## Todo
 
 - [ ] Proper (de)serialization of messages to and from topics.
 - [ ] Elastic integration project.
+- [ ] HTTP integration project. (Integration which makes and receives simple http requests.)
 
 More to come..
