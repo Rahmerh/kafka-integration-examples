@@ -15,7 +15,7 @@ I have the following applications/containers in this project
 - **nu.example.FirestoreConsumer**
   - Consumes bank account messages from the `bank-accounts` topic and writes them to the `BankAccounts` firestore collection.
 - **nu.example.ConsoleProducer**
-  - A simple console producer which will produce a static user or bankaccount message. Can be used to test several consumer/producers.
+  - A simple console producer which will produce a static user or bankaccount message. Can be used to test several consumer/producers. This project is not included in the docker-compose file but can be run locally. Simply execute `dotnet run` in the project folder and choose an option.
 - **nu.example.Shared**
   - Library project containing models, settings and shared dependencies.
 
