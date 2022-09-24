@@ -131,14 +131,8 @@ services:
       CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-7.0.1.jar
       CONNECT_PRODUCER_INTERCEPTOR_CLASSES: 'io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor'
       CONNECT_CONSUMER_INTERCEPTOR_CLASSES: 'io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor'
-      CONNECT_PLUGIN_PATH: '/usr/share/java,/usr/share/confluent-hub-components,/etc/kafka-connect/jars'
+      CONNECT_PLUGIN_PATH: '/usr/share/java,/usr/share/confluent-hub-components'
       CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
-    volumes:
-      - ./configuration/jars:/etc/kafka-connect/jars
-      - ./configuration/firestore:/usr/share/firestore/config
-      - ./configuration/zoho/config:/usr/share/zoho/config
-      - ./configuration/zoho/resources:/usr/share/zoho/resources
-      - ./configuration/zoho/logs:/usr/share/zoho/logs
     healthcheck:
       test: ['CMD', 'nc', '127.0.0.1', '8083']
       interval: 10s

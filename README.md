@@ -12,18 +12,18 @@ I have the following applications/containers in this project
   - An example for a duplicate message filter. This application caches the user hashes in a redis cache and compares it vs the incoming user.
 - **nu.example.FirestoreProducer**
   - A simple producer which listens to the `Users` collection in firestore and produces a message for each document change.
-- **nu.example.UserConsumer**
+- **nu.example.FirestoreConsumer**
   - Consumes user messages from the topic and writes the results to the console.
 - **nu.example.UserProducer**
   - More a PoC than anything else, when it starts it'll produce a single message to the `users` topic.
 - **nu.example.Shared**
-  - Library project containing models, settings and dependencies.
+  - Library project containing models, settings and shared dependencies.
 
 ## Requirements
 
 - [Dotnet 6.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
 - [Docker](https://www.docker.com/)
-- [Docker-compose](https://docs.docker.com/compose/install/)
+- [docker-compose](https://docs.docker.com/compose/install/)
 
 ## Usage
 
@@ -41,7 +41,9 @@ I've included a couple of guis to visualize the data you're working with:
 - [Redisinsight](https://redis.io/docs/stack/insight/)
   - [`localhost:2002`](http://localhost:2002)
 
-### Cache setup
+I personally recommend [kaskade](https://github.com/sauljabin/kaskade) as an awesome TUI to view your kafka topics. For installation and configuration, view the linked github page.
+
+### Redisinsight setup
 
 A few small steps are needed to setup redisinsights:
 
