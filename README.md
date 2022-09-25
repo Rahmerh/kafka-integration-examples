@@ -62,7 +62,7 @@ I've included a couple of guis to visualize the data you're working with:
 - [Redisinsight](https://redis.io/docs/stack/insight/)
   - [`localhost:2002`](http://localhost:2002)
 
-I personally recommend [kaskade](https://github.com/sauljabin/kaskade) as an awesome TUI to view your kafka topics. For installation and configuration, view the linked github page.
+I personally recommend [kaskade](https://github.com/sauljabin/kaskade) as an awesome TUI to view your kafka topics. Configuration file is included. Install the tool (see link for instructions) and run this command in the root of this repo: `kaskade kaskade.yml`
 
 ### Redisinsight setup
 
