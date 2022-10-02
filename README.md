@@ -10,11 +10,11 @@ These projects are meant as examples to custom built integrations instead of the
 
 Please visit the [wiki](https://github.com/Rahmerh/kafka-integration-examples/wiki) for more information & instructions about how to get started.
 
-## Stability
+# Stability
 
 I'm currently the only one working on this repository and am constantly pushing to the main branch. This means it's possible I accidentally push breaking changes. Please make sure to pull frequently if you're using my repo as an example. I cannot guarantee stability in this project.
 
-## Todo
+# Todo
 
 - [x] Proper (de)serialization of messages to and from topics.
 - [x] Fix configuration warnings that occur during startup.
