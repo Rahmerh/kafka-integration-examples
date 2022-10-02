@@ -37,6 +37,18 @@ services:
       cache:
         condition: service_healthy
 
+  http-producer:
+    container_name: http-producer
+    build: ./nu.example.HttpProducer/.
+    image: httpproducer:httpproducer
+    networks:
+      - 'kafka-example-network'
+    ports:
+      - '2100:80'
+    depends_on:
+      connect:
+        condition: service_healthy
+
   # Kafka infra
   zookeeper:
     container_name: kafka-zookeeper

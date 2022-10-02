@@ -1,0 +1,9 @@
+request {
+    method "POST"
+    url "http://localhost:2100/bankaccount"
+    contentType "application/json"
+}
+
+body {
+    readFrom "./data.json"
+} 

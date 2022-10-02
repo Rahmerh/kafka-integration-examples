@@ -20,6 +20,8 @@ The following projects (with description) are currently in this repo. Everything
   - Consumes bank account messages from the `bank-accounts` topic and writes them to the `BankAccounts` firestore collection.
 - **nu.example.ConsoleProducer**
   - A simple console producer which will produce a static user or bankaccount message. Can be used to test several consumer/producers. This project is not included in the docker-compose file but can be run locally. Simply execute `dotnet run` in the project folder and choose an option.
+- **nu.Example.HttpProducer**
+  - Just a web api which takes requests and posts a message to the 'bank-accounts' topic. Could be used in a webhook for example. You can find sample requests in `/Requests/HttpProducer`, both a curl command and a resto file.
 - **nu.example.Shared**
   - Library project containing models, settings and shared dependencies.
 
@@ -66,6 +68,10 @@ I've included a couple of guis to visualize the data you're working with:
 
 I personally recommend [kaskade](https://github.com/sauljabin/kaskade) as an awesome TUI to view your kafka topics. Configuration file is included. Install the tool (see link for instructions) and run this command in the root of this repo: `kaskade kaskade.yml`
 
+### Resto
+
+I recommend using [resto](https://github.com/abdfnx/resto) for making simple http requests from the command line. It's fast, easy to use and perfect for storing sample requests in your repository. Of course curl works just as well, but resto provides a nice UI.
+
 ### Redisinsight setup
 
 A few small steps are needed to setup redisinsights:
@@ -81,14 +87,14 @@ A few small steps are needed to setup redisinsights:
 
 ## Stability
 
-I'm currently the only one working on this repository and am constantly pushing to the main branch. This means it's possible I accidentally push breaking changes. Please make sure to pull frequently if you're using my repo as an example. I cannot guarantee any stability in this project.
+I'm currently the only one working on this repository and am constantly pushing to the main branch. This means it's possible I accidentally push breaking changes. Please make sure to pull frequently if you're using my repo as an example. I cannot guarantee stability in this project.
 
 ## Todo
 
 - [x] Proper (de)serialization of messages to and from topics.
 - [ ] Fix configuration warnings that occur during startup.
 - [ ] Elastic integration project.
-- [ ] HTTP integration projects. (Integration which makes and receives simple http requests.)
+- [x] HTTP integration projects. (Integration which makes and receives simple http requests.)
 - [ ] K8s setup, load testing & helm charts.
 
 More to come..
