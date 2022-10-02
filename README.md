@@ -21,7 +21,7 @@ I'm currently the only one working on this repository and am constantly pushing 
   - [ ] Create short wait loop for topic(s) to be created.
 - [ ] Elastic integration project.
 - [x] HTTP integration projects. (Integration which makes and receives simple http requests.)
-- [ ] K8s setup, load testing & helm charts.
+- [ ] K8s setup, load testing ([K6](https://k6.io/)) & helm charts.
 - [ ] Expand new wiki pages.
 
 More to come..
