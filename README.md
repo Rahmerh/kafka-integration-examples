@@ -6,84 +6,8 @@ This repository functions as a bunch of example integrations you can have with k
 
 These projects are meant as examples to custom built integrations instead of the [out of the box](https://docs.confluent.io/kafka-connectors/self-managed/kafka_connectors.html) ones. Those also work fine, but if you need some business logic you need a custom built one. This repository serves as a bunch of examples to help you set up quickly.
 
-## Contents
-
-### Projects
-
-The following projects (with description) are currently in this repo. Everything should be started automatically if you follow the steps in the 'Usage' section.
-
-- **nu.example.DuplicateMessageFilter**
-  - An example for a duplicate message filter. This application caches the user hashes in a redis cache and compares it vs the incoming user. If the incoming message is the same, it won't produce the user message to the output topic.
-- **nu.example.FirestoreProducer**
-  - A simple producer which listens to the `Users` collection in firestore and produces a message for each document change.
-- **nu.example.FirestoreConsumer**
-  - Consumes bank account messages from the `bank-accounts` topic and writes them to the `BankAccounts` firestore collection.
-- **nu.example.ConsoleProducer**
-  - A simple console producer which will produce a static user or bankaccount message. Can be used to test several consumer/producers. This project is not included in the docker-compose file but can be run locally. Simply execute `dotnet run` in the project folder and choose an option.
-- **nu.Example.HttpProducer**
-  - Just a web api which takes requests and posts a message to the `bank-accounts` topic. Could be used in a webhook for example. You can find sample requests in `/Requests/HttpProducer`, both a curl command and a resto file.
-- **nu.example.Shared**
-  - Library project containing models, settings and shared dependencies.
-
-### Kafka infra
-
-I have the following containers/kafka services included in the docker-compose file:
-
-- 1 Zookeeper instance
-- 1 Broker instance
-- 1 Connect instance
-- 1 Schema registry instance (For automatic (de)serialization)
-
-### Other infra
-
-The following containers are automatically created to be used in the integration projects.
-
-- 1 Redis cache + 1 redisinsight instance
-- 1 Firesbase emulator (Only the firestore emulator is set up)
-- 1 AKHQ instance
-
-## Requirements
-
-- [Dotnet 6.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
-- [Docker](https://www.docker.com/)
-- [docker-compose](https://docs.docker.com/compose/install/)
-
-## Usage
-
-1. Build (`dotnet build`) the solution.
-2. Execute `docker-compose up -d --build`
-
-## GUIs
-
-I've included a couple of guis to visualize the data you're working with:
-
-- [AKHQ](https://github.com/tchiotludo/akhq)
-  - [`localhost:2000`](http://localhost:2000)
-- [Firebase emulator](https://firebase.google.com/docs/emulator-suite)
-  - [`localhost:2001`](http://localhost:2001)
-- [Redisinsight](https://redis.io/docs/stack/insight/)
-  - [`localhost:2002`](http://localhost:2002)
-
-### Kaskade
-
-I personally recommend [kaskade](https://github.com/sauljabin/kaskade) as an awesome TUI to view your kafka topics. Configuration file is included. Install the tool (see link for instructions) and run this command in the root of this repo: `kaskade kaskade.yml`
-
-### Resto
-
-I recommend using [resto](https://github.com/abdfnx/resto) for making simple http requests from the command line. It's fast, easy to use and perfect for storing sample requests in your repository. Of course curl works just as well, but resto provides a nice UI.
-
-### Redisinsight setup
-
-A few small steps are needed to setup redisinsights:
-
-1. Navigate to `localhost:2002`
-2. Click on `I already have a database` then click on `Connect to a Redis Database`
-3. Fill in the following values:
-
-- Host: `cache`
-- Port: `6379`
-- Name: `Cache`
-- Password: `SUPER_SECRET_PASS`
+# Getting started
+Please visit the [wiki](https://github.com/Rahmerh/kafka-integration-examples/wiki) for more information & instructions about how to get started.
 
 ## Stability
 
