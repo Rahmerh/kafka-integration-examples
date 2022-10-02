@@ -10,7 +10,9 @@ services:
     networks:
       - 'kafka-example-network'
     depends_on:
-      connect:
+      broker:
+        condition: service_healthy
+      kafka-schema-registry:
         condition: service_healthy
 
   firestore-producer:
@@ -22,7 +24,9 @@ services:
     networks:
       - 'kafka-example-network'
     depends_on:
-      connect:
+      broker:
+        condition: service_healthy
+      kafka-schema-registry:
         condition: service_healthy
 
   duplicate-message-filter:
@@ -32,9 +36,11 @@ services:
     networks:
       - 'kafka-example-network'
     depends_on:
-      connect:
+      broker:
         condition: service_healthy
       cache:
+        condition: service_healthy
+      kafka-schema-registry:
         condition: service_healthy
 
   http-producer:
@@ -46,7 +52,9 @@ services:
     ports:
       - '2100:80'
     depends_on:
-      connect:
+      broker:
+        condition: service_healthy
+      kafka-schema-registry:
         condition: service_healthy
 
   # Kafka infra
@@ -60,6 +68,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_SESSION_TIMEOUT_MS: 500000
+      ZOOKEEPER_SASL_ENABLED: "false"
     healthcheck:
       test: nc -z localhost 2181 || exit -1
       interval: 10s
@@ -82,23 +91,19 @@ services:
       - '9094:9094'
       - '9095:9095'
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,LINUX_EXTERNAL_HOST:PLAINTEXT,WINDOWS_EXTERNAL_HOST:PLAINTEXT,LOCALHOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,LINUX_EXTERNAL_HOST://172.17.0.1:9093,WINDOWS_EXTERNAL_HOST://host.docker.internal:9094,LOCALHOST://localhost:9095
-      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      KAFKA_LISTENERS: SASL_PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: SASL_PLAINTEXT://localhost:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      ZOOKEEPER_SASL_ENABLED: 'false'
+      KAFKA_OPTS: '-Djava.security.auth.login.config=/etc/kafka/kafka_server_jaas.conf'
+      KAFKA_INTER_BROKER_LISTENER_NAME: SASL_PLAINTEXT
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_JMX_PORT: 9101
-      KAFKA_JMX_HOSTNAME: localhost
-      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:9092
-      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
-      CONFLUENT_METRICS_ENABLE: 'true'
-      CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+      CONFLUENT_METRICS_ENABLE: 'false'
+    volumes:
+      - ./Kafka/kafka_server_jaas.conf:/etc/kafka/kafka_server_jaas.conf
+      - ./Kafka/data:/var/lib/kafka/data
     healthcheck:
       test: ['CMD', 'nc', '127.0.0.1', '9092']
       interval: 10s
@@ -122,49 +127,28 @@ services:
     depends_on:
       broker:
         condition: service_healthy
-
-  connect:
-    container_name: kafka-connect
-    image: confluentinc/cp-kafka-connect:latest
-    hostname: connect
-    depends_on:
-      broker:
-        condition: service_healthy
-    ports:
-      - '8083:8083'
-      - '8180:8180'
-      - '8181:8181'
-    environment:
-      CONNECT_BOOTSTRAP_SERVERS: 'broker:9092'
-      CONNECT_REST_ADVERTISED_HOST_NAME: connect
-      CONNECT_GROUP_ID: compose-connect-group
-      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
-      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
-      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
-      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
-      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
-      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
-      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
-      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-7.0.1.jar
-      CONNECT_PRODUCER_INTERCEPTOR_CLASSES: 'io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor'
-      CONNECT_CONSUMER_INTERCEPTOR_CLASSES: 'io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor'
-      CONNECT_PLUGIN_PATH: '/usr/share/java,/usr/share/confluent-hub-components'
-      CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
     healthcheck:
-      test: ['CMD', 'nc', '127.0.0.1', '8083']
-      interval: 10s
+      test:
+        [
+          'CMD',
+          'curl',
+          '--output',
+          '/dev/null',
+          '--silent',
+          '--head',
+          '--fail',
+          'http://kafka-schema-registry:8081/subjects',
+        ]
+      interval: 5s
       timeout: 10s
-      retries: 80
-    networks:
-      - 'kafka-example-network'
+      retries: 30
 
   init-kafka:
     image: confluentinc/cp-kafka:latest
     depends_on:
-      connect:
+      broker:
+        condition: service_healthy
+      kafka-schema-registry:
         condition: service_healthy
     networks:
       - 'kafka-example-network'
@@ -189,15 +173,15 @@ services:
                 bootstrap.servers: "broker:9092"
               schema-registry:
                 url: "http://kafka-schema-registry:8081"
-              connect:
-                - name: "connect"
-                  url: "http://connect:8083"
+
     ports:
       - 2000:8080
     networks:
       - 'kafka-example-network'
     depends_on:
-      connect:
+      broker:
+        condition: service_healthy
+      kafka-schema-registry:
         condition: service_healthy
 
   firebase-emulator:
