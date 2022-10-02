@@ -19,6 +19,9 @@ I'm currently the only one working on this repository and am constantly pushing 
 - [x] Proper (de)serialization of messages to and from topics.
 - [x] Fix configuration warnings that occur during startup.
   - [ ] Create short wait loop for topic(s) to be created.
+- [ ] Improve parts of the code
+  - [ ] Introduce dependency injection in all applications.
+  - [ ] Move creation of settings into shared helper classes.
 - [ ] Elastic integration project.
 - [x] HTTP integration projects. (Integration which makes and receives simple http requests.)
 - [ ] Kubernetes setup, load testing ([K6](https://k6.io/)) & helm charts.
