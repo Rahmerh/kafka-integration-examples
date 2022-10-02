@@ -43,3 +43,7 @@ FirebaseEmulator/Data/export-on-close
 
 Cache/RedisInsight
 Cache/Data
+
+Kafka/Broker/data
+Kafka/Zookeeper/data/
+Kafka/Zookeeper/logs/

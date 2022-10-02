@@ -68,7 +68,10 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_SESSION_TIMEOUT_MS: 500000
-      ZOOKEEPER_SASL_ENABLED: "false"
+    volumes:
+      - ./Kafka/Zookeeper/kafka_zookeeper_jaas.conf:/etc/zookeeper/zookeeper_jaas.conf
+      - ./Kafka/Zookeeper/data:/var/lib/zookeeper/data
+      - ./Kafka/Zookeeper/logs:/var/lib/zookeeper/log
     healthcheck:
       test: nc -z localhost 2181 || exit -1
       interval: 10s
@@ -86,29 +89,32 @@ services:
         condition: service_healthy
     ports:
       - '9092:9092'
-      - '9101:9101'
       - '9093:9093'
-      - '9094:9094'
-      - '9095:9095'
     environment:
-      KAFKA_LISTENERS: SASL_PLAINTEXT://:9092
-      KAFKA_ADVERTISED_LISTENERS: SASL_PLAINTEXT://localhost:9092
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      ZOOKEEPER_SASL_ENABLED: 'false'
-      KAFKA_OPTS: '-Djava.security.auth.login.config=/etc/kafka/kafka_server_jaas.conf'
-      KAFKA_INTER_BROKER_LISTENER_NAME: SASL_PLAINTEXT
-      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
-      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://broker:9092,EXTERNAL://localhost:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      CONFLUENT_METRICS_ENABLE: 'false'
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:9092
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      CONFLUENT_METRICS_ENABLE: 'true'
+      CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
     volumes:
-      - ./Kafka/kafka_server_jaas.conf:/etc/kafka/kafka_server_jaas.conf
-      - ./Kafka/data:/var/lib/kafka/data
+      - ./Kafka/Broker/kafka_server_jaas.conf:/etc/kafka/kafka_jaas.conf
+      - ./Kafka/Broker/data:/var/lib/kafka/data
     healthcheck:
       test: ['CMD', 'nc', '127.0.0.1', '9092']
       interval: 10s
       timeout: 10s
-      retries: 80
+      retries: 10
     networks:
       - 'kafka-example-network'
 
