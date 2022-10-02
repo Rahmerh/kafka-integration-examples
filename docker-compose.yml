@@ -60,7 +60,7 @@ services:
   # Kafka infra
   zookeeper:
     container_name: kafka-zookeeper
-    image: confluentinc/cp-zookeeper:latest
+    image: wurstmeister/zookeeper:latest
     hostname: zookeeper
     ports:
       - '2181:2181'
@@ -68,21 +68,20 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_SESSION_TIMEOUT_MS: 500000
+      JVMFLAGS: '-Djava.security.auth.login.config=/etc/zookeeper/zookeeper_jaas.conf'
     volumes:
       - ./Kafka/Zookeeper/kafka_zookeeper_jaas.conf:/etc/zookeeper/zookeeper_jaas.conf
-      - ./Kafka/Zookeeper/data:/var/lib/zookeeper/data
-      - ./Kafka/Zookeeper/logs:/var/lib/zookeeper/log
     healthcheck:
       test: nc -z localhost 2181 || exit -1
-      interval: 10s
+      interval: 2s
       timeout: 10s
-      retries: 80
+      retries: 20
     networks:
       - 'kafka-example-network'
 
   broker:
     container_name: kafka-broker
-    image: confluentinc/cp-server:latest
+    image: wurstmeister/kafka:latest
     hostname: broker
     depends_on:
       zookeeper:
@@ -91,32 +90,53 @@ services:
       - '9092:9092'
       - '9093:9093'
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INTERNAL://:9092,EXTERNAL://:9093
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://broker:9092,EXTERNAL://localhost:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:SASL_PLAINTEXT,EXTERNAL:SASL_PLAINTEXT
+      ALLOW_PLAINTEXT_LISTENER: 'yes'
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:9092
-      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
-      CONFLUENT_METRICS_ENABLE: 'true'
-      CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_SECURITY_PROTOCOL: SASL_PLAINTEXT
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      KAFKA_OPTS: '-Djava.security.auth.login.config=/etc/kafka/kafka_jaas.conf'
     volumes:
       - ./Kafka/Broker/kafka_server_jaas.conf:/etc/kafka/kafka_jaas.conf
-      - ./Kafka/Broker/data:/var/lib/kafka/data
     healthcheck:
-      test: ['CMD', 'nc', '127.0.0.1', '9092']
-      interval: 10s
+      test: ['CMD', 'nc', '-vz', 'localhost', '9092']
+      interval: 2s
       timeout: 10s
-      retries: 10
+      retries: 20
     networks:
       - 'kafka-example-network'
+
+  init-kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      broker:
+        condition: service_healthy
+    environment:
+      ALLOW_PLAINTEXT_LISTENER: 'yes'
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_SECURITY_PROTOCOL: SASL_PLAINTEXT
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+      KAFKA_OPTS: '-Djava.security.auth.login.config=/etc/kafka/kafka_jaas.conf'
+    networks:
+      - 'kafka-example-network'
+    volumes:
+      - ./Kafka/Broker/kafka_server_jaas.conf:/etc/kafka/kafka_jaas.conf
+      - ./Kafka/Broker/config.properties:/etc/kafka/config.properties
+    entrypoint: ['/bin/sh', '-c']
+    command: |
+      "
+      echo -e 'Creating kafka topics'
+      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic users --replication-factor 1 --partitions 1 --command-config /etc/kafka/config.properties
+      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic users-filtered --replication-factor 1 --partitions 1 --command-config /etc/kafka/config.properties
+      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic bank-accounts --replication-factor 1 --partitions 1 --command-config /etc/kafka/config.properties
+      "
 
   kafka-schema-registry:
     image: confluentinc/cp-schema-registry:latest
@@ -125,9 +145,15 @@ services:
     ports:
       - '8081:8081'
     environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://broker:9092
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: SASL_PLAINTEXT://broker:9092
       SCHEMA_REGISTRY_HOST_NAME: kafka-schema-registry
       SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SASL_PLAINTEXT
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM: PLAIN
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_JAAS_CONFIG:
+        "org.apache.kafka.common.security.plain.PlainLoginModule required \
+        username=\"admin\" \
+        password=\"admin-secret\";"
     networks:
       - 'kafka-example-network'
     depends_on:
@@ -145,27 +171,10 @@ services:
           '--fail',
           'http://kafka-schema-registry:8081/subjects',
         ]
-      interval: 5s
+      interval: 2s
       timeout: 10s
-      retries: 30
+      retries: 20
 
-  init-kafka:
-    image: confluentinc/cp-kafka:latest
-    depends_on:
-      broker:
-        condition: service_healthy
-      kafka-schema-registry:
-        condition: service_healthy
-    networks:
-      - 'kafka-example-network'
-    entrypoint: ['/bin/sh', '-c']
-    command: |
-      "
-      echo -e 'Creating kafka topics'
-      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic users --replication-factor 1 --partitions 1
-      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic users-filtered --replication-factor 1 --partitions 1
-      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic bank-accounts --replication-factor 1 --partitions 1
-      "
   # Misc infra
   akhq:
     image: tchiotludo/akhq
@@ -177,6 +186,9 @@ services:
             docker-kafka-server:
               properties:
                 bootstrap.servers: "broker:9092"
+                security.protocol: SASL_PLAINTEXT 
+                sasl.mechanism: PLAIN
+                sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret";
               schema-registry:
                 url: "http://kafka-schema-registry:8081"
 
@@ -221,7 +233,7 @@ services:
       test: ['CMD', 'redis-cli', '--raw', 'incr', 'ping']
       interval: 1s
       timeout: 3s
-      retries: 5
+      retries: 10
 
   redisinsight:
     image: redislabs/redisinsight:latest

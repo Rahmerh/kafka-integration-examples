@@ -17,8 +17,9 @@ var config = new ProducerConfig
 {
     BootstrapServers = kafkaSettings.BootstrapServers,
     SaslMechanism = SaslMechanism.Plain,
-    SecurityProtocol = SecurityProtocol.Plaintext,
-};
+    SecurityProtocol = SecurityProtocol.SaslPlaintext,
+    SaslUsername = "admin",
+    SaslPassword = "admin-secret" };
 
 var schemaRegistryConfig = new SchemaRegistryConfig
 {

@@ -92,7 +92,8 @@ I'm currently the only one working on this repository and am constantly pushing 
 ## Todo
 
 - [x] Proper (de)serialization of messages to and from topics.
-- [ ] Fix configuration warnings that occur during startup.
+- [x] Fix configuration warnings that occur during startup.
+  - [ ] Create short wait loop for topic(s) to be created.
 - [ ] Elastic integration project.
 - [x] HTTP integration projects. (Integration which makes and receives simple http requests.)
 - [ ] K8s setup, load testing & helm charts.

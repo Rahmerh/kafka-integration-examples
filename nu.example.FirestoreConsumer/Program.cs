@@ -27,7 +27,10 @@ var kafkaSettings = configuration.GetRequiredSection("Kafka").Get<KafkaSettings>
 var config = new ConsumerConfig
 {
     BootstrapServers = kafkaSettings.BootstrapServers,
-    SaslMechanism = SaslMechanism.Plain,
+        SaslMechanism = SaslMechanism.Plain,
+    SecurityProtocol = SecurityProtocol.SaslPlaintext,
+    SaslUsername = kafkaSettings.KafkaUsername,
+    SaslPassword = kafkaSettings.KafkaPassword,
     GroupId = kafkaSettings.GroupId,
 };
 

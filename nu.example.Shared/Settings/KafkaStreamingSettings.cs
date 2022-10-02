@@ -7,4 +7,6 @@ public class KafkaStreamingSettings
     public string? InputTopic { get; set; }
     public string? OutputTopic { get; set; }
     public string? SchemaRegistryUrl { get; set; }
+    public string? KafkaUsername {get;set;}
+    public string? KafkaPassword {get;set;}
 }

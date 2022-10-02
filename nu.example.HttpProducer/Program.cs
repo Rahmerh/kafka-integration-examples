@@ -46,6 +46,10 @@ builder.Services.AddScoped<IProducer<Null, BankAccount>>(x =>
     {
         BootstrapServers = settings.Value.BootstrapServers,
         SaslMechanism = SaslMechanism.Plain,
+        SecurityProtocol = SecurityProtocol.SaslPlaintext,
+        SaslUsername = settings.Value.KafkaUsername,
+        SaslPassword = settings.Value.KafkaPassword,
+
     };
 
     ISerializer<BankAccount> jsonSerializer = x.GetRequiredService<ISerializer<BankAccount>>();

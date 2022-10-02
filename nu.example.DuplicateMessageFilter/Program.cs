@@ -32,8 +32,9 @@ var consumerConfig = new ConsumerConfig
     BootstrapServers = kafkaSettings.BootstrapServers,
     GroupId = kafkaSettings.GroupId,
     SaslMechanism = SaslMechanism.Plain,
-    SaslUsername = "",
-    SaslPassword = ""
+    SecurityProtocol = SecurityProtocol.SaslPlaintext,
+    SaslUsername = kafkaSettings.KafkaUsername,
+    SaslPassword = kafkaSettings.KafkaPassword
 };
 
 using var c = new ConsumerBuilder<Ignore, User>(consumerConfig)
@@ -54,8 +55,9 @@ var producerConfig = new ProducerConfig
 {
     BootstrapServers = kafkaSettings.BootstrapServers,
     SaslMechanism = SaslMechanism.Plain,
-    SaslUsername = "",
-    SaslPassword = ""
+    SecurityProtocol = SecurityProtocol.SaslPlaintext,
+    SaslUsername = kafkaSettings.KafkaUsername,
+    SaslPassword = kafkaSettings.KafkaPassword
 };
 
 var schemaRegistryConfig = new SchemaRegistryConfig
