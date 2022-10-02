@@ -21,7 +21,7 @@ The following projects (with description) are currently in this repo. Everything
 - **nu.example.ConsoleProducer**
   - A simple console producer which will produce a static user or bankaccount message. Can be used to test several consumer/producers. This project is not included in the docker-compose file but can be run locally. Simply execute `dotnet run` in the project folder and choose an option.
 - **nu.Example.HttpProducer**
-  - Just a web api which takes requests and posts a message to the 'bank-accounts' topic. Could be used in a webhook for example. You can find sample requests in `/Requests/HttpProducer`, both a curl command and a resto file.
+  - Just a web api which takes requests and posts a message to the `bank-accounts` topic. Could be used in a webhook for example. You can find sample requests in `/Requests/HttpProducer`, both a curl command and a resto file.
 - **nu.example.Shared**
   - Library project containing models, settings and shared dependencies.
 
