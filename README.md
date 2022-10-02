@@ -7,6 +7,7 @@ This repository functions as a bunch of example integrations you can have with k
 These projects are meant as examples to custom built integrations instead of the [out of the box](https://docs.confluent.io/kafka-connectors/self-managed/kafka_connectors.html) ones. Those also work fine, but if you need some business logic you need a custom built one. This repository serves as a bunch of examples to help you set up quickly.
 
 # Getting started
+
 Please visit the [wiki](https://github.com/Rahmerh/kafka-integration-examples/wiki) for more information & instructions about how to get started.
 
 ## Stability
@@ -21,5 +22,6 @@ I'm currently the only one working on this repository and am constantly pushing 
 - [ ] Elastic integration project.
 - [x] HTTP integration projects. (Integration which makes and receives simple http requests.)
 - [ ] K8s setup, load testing & helm charts.
+- [ ] Expand new wiki pages.
 
 More to come..
